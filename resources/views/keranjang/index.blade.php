@@ -12,6 +12,23 @@
         padding: 20px;
     }
 
+    .cart-alert-danger {
+        background-color: #3e2a2a;
+        color: #e57373;
+        border: 1px solid #7c2e2e;
+    }
+
+    .stok-info {
+        font-size: 0.85em;
+        color: #888;
+        margin-top: 5px;
+    }
+    
+    .stok-warning {
+        color: #e57373; /* Merah */
+        font-weight: bold;
+    }
+    
     .cart-title {
         text-align: center;
         color: yellowgreen;
@@ -156,8 +173,14 @@
 <div class="cart-container">
     <h3 class="cart-title">Keranjang Belanja</h3>
 
+    {{-- Alert Success --}}
     @if(session('success'))
         <div class="cart-alert cart-alert-success">{{ session('success') }}</div>
+    @endif
+
+    {{-- Alert Error (Untuk Stok Kurang) --}}
+    @if(session('error'))
+        <div class="cart-alert cart-alert-danger">{{ session('error') }}</div>
     @endif
 
     @if($items->isEmpty())
@@ -168,13 +191,24 @@
         </div>
     @else
         <div class="cart-items-list">
-            @php $total = 0; @endphp
+            @php 
+                $total = 0; 
+                $bisaCheckout = true; // Flag untuk cek apakah boleh checkout
+            @endphp
+            
             @foreach($items as $item)
                 @php
                     $subtotal = $item->produk->harga * $item->jumlah;
                     $total += $subtotal;
+                    
+                    // Cek apakah jumlah di keranjang melebihi stok real-time
+                    $stokKurang = $item->jumlah > $item->produk->stok;
+                    if($stokKurang) {
+                        $bisaCheckout = false; // Kunci tombol checkout
+                    }
                 @endphp
-                <div class="cart-item">
+                
+                <div class="cart-item" style="{{ $stokKurang ? 'border: 1px solid #e57373;' : '' }}">
                     <div class="cart-item-img">
                          @if ($item->produk->foto)
                             <img src="{{ asset('foto_produk/' . $item->produk->foto) }}" alt="{{ $item->produk->nama }}">
@@ -185,6 +219,19 @@
                     <div class="cart-item-details">
                         <h5>{{ $item->produk->nama }}</h5>
                         <p>Rp{{ number_format($item->produk->harga) }} x {{ $item->jumlah }}</p>
+                        
+                        {{-- INFO SISA STOK --}}
+                        <div class="stok-info">
+                            @if($stokKurang)
+                                <span class="stok-warning">
+                                    <i class="fa fa-exclamation-triangle"></i> 
+                                    Stok cuma ada {{ $item->produk->stok }}! Kurangi jumlah pembelian.
+                                </span>
+                            @else
+                                Sisa Stok Tersedia: {{ $item->produk->stok }}
+                            @endif
+                        </div>
+
                     </div>
                     <div class="cart-item-actions">
                         <p class="cart-item-subtotal">Rp{{ number_format($subtotal) }}</p>
@@ -203,7 +250,17 @@
                 <span>Total Belanja</span>
                 <span>Rp{{ number_format($total) }}</span>
             </div>
-            <a href="{{ route('checkout.form') }}" class="btn-checkout">Lanjut ke Checkout</a>
+            
+            @if($bisaCheckout)
+                <a href="{{ route('checkout.form') }}" class="btn-checkout">Lanjut ke Checkout</a>
+            @else
+                <button class="btn-checkout" style="background-color: #555; cursor: not-allowed; color: #888;" disabled>
+                    Stok Tidak Mencukupi (Periksa Barang Anda)
+                </button>
+                <p style="text-align: center; color: #e57373; margin-top: 10px; font-size: 0.9em;">
+                    Ada barang yang melebihi stok tersedia. Silakan hapus atau kurangi barang yang bertanda merah.
+                </p>
+            @endif
         </div>
     @endif
 </div>

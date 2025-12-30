@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('alamat_pengiriman');
             $table->string('metode_pembayaran');
-            $table->enum('status', ['menunggu', 'diproses', 'ditolak', 'dikirim', 'selesai'])->default('menunggu');
+            $table->enum('status', ['menunggu_pembayaran', 'menunggu', 'diproses', 'ditolak', 'dikirim', 'selesai'])->default('menunggu_pembayaran');
             $table->integer('total_harga');
             $table->timestamps();
         });

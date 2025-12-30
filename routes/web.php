@@ -23,25 +23,6 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-// Route::get('/kontak', function () {
-//     return view('welcome');
-// });
-
-// Route::get('/siswa', function () {
-//     return "Saya siswa";
-// });
-
-// Route::get('/siswa/{id}/', function ($id) {
-//     return "Saya siswa Nim $id";
-// })->where('id', '[0-9]+');
-
-// Route::get('/siswa/{id}/{nama}', function ($id, $nama) {
-//     return "Saya siswa Nim $id Nama $nama";
-// })->where(['id'=>'[0-9]+', 'nama'=>'[A-Za-z]+']);
-
-// Route::get('siswa', [SiswaController::class, 'index']);
-// Route::get('siswa/{id}', [SiswaController::class, 'detail'])->where('id', '[0-9]+');
-
 Route::get('/', [HalamanController::class, 'index']);
 Route::get('/tentang', [HalamanController::class, 'tentang']);
 Route::get('/kontak', [HalamanController::class, 'kontak']);
@@ -93,6 +74,7 @@ Route::get('/checkout', [CheckoutController::class, 'formCheckout'])->name('chec
 Route::post('/checkout', [CheckoutController::class, 'prosesCheckout'])->name('checkout.proses');
 
 Route::get('/pesanan-saya', [PesananController::class, 'index'])->name('pesanan.saya');
+Route::post('/pesanan/{id}/selesai', [PesananController::class, 'selesai'])->name('pesanan.selesai');
 
 Route::middleware('role:admin')->group(function () {
     Route::get('/admin', [DashboardController::class, 'dashboard'])->name('admin.dashboard');

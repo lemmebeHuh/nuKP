@@ -55,6 +55,31 @@
 <body>
     @include('komponen.menu1')
     @include('komponen.loginfo')
+    <div style="width: 90%; margin: 20px auto;">
+        @if (session('success'))
+            <div style="padding: 15px; background-color: #2a3a2a; color: #a3d9a5; border: 1px solid #3c763d; border-radius: 5px; margin-bottom: 20px;">
+                <b>Berhasil!</b> {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div style="padding: 15px; background-color: #3e2a2a; color: #e57373; border: 1px solid #7c2e2e; border-radius: 5px; margin-bottom: 20px;">
+                <b>Gagal!</b> {{ session('error') }}
+            </div>
+        @endif
+        
+        {{-- Jika ada error dari validasi form (seperti required field kurang) --}}
+        @if ($errors->any())
+            <div style="padding: 15px; background-color: #3e2a2a; color: #e57373; border: 1px solid #7c2e2e; border-radius: 5px; margin-bottom: 20px;">
+                <b>Periksa Inputan Anda:</b>
+                <ul style="margin: 0; padding-left: 20px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    </div>
     
     @yield('konten')
     

@@ -145,6 +145,14 @@
                 <textarea class="form-control-dark" id="alamat_pengiriman" name="alamat_pengiriman" rows="4" required>{{ old('alamat_pengiriman') }}</textarea>
             </div>
             <div class="form-group">
+                <label for="wilayah">Wilayah Pengiriman (Ongkir Flat)</label>
+                <select class="form-control-dark" id="wilayah" name="wilayah" required>
+                    <option value="">-- Pilih Wilayah --</option>
+                    <option value="bandung_kota">Bandung Kota (Rp 10.000)</option>
+                    <option value="bandung_barat">Bandung Barat (Rp 20.000)</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="telepon">Nomor Telepon (WhatsApp)</label>
                 <input type="text" class="form-control-dark" id="telepon" name="telepon" value="{{ old('telepon') }}" required placeholder="Contoh: 081234567890">
             </div>
@@ -152,11 +160,60 @@
             <h4 style="margin-top: 40px;">Metode Pembayaran</h4>
             <div class="form-group">
                 <label for="metode_pembayaran">Pilih Metode Pembayaran</label>
-                <select class="form-control-dark" id="metode_pembayaran" name="metode_pembayaran" required>
+                <select class="form-control-dark" id="metode_pembayaran" name="metode_pembayaran" required onchange="cekMetodePembayaran()">
                     <option value="cod">Cash on Delivery (COD)</option>
-                    {{-- Opsi pembayaran lain bisa ditambahkan di sini --}}
+                    <option value="transfer_bca">Transfer Bank BCA</option>
+                    <option value="transfer_mandiri">Transfer Bank Mandiri</option>
+                    <option value="ewallet_dana">E-Wallet DANA</option>
                 </select>
             </div>
+
+            {{-- Info Rekening (Hidden by default, muncul via JS) --}}
+            <div id="info-transfer" style="display: none; background-color: #2c2c2c; padding: 15px; border-radius: 5px; border: 1px solid yellowgreen; margin-bottom: 20px;">
+                <h5 style="color: yellowgreen; margin-top: 0;">Instruksi Pembayaran</h5>
+                <p style="color: #ccc; font-size: 0.9em;">Silakan transfer sesuai total pesanan ke:</p>
+                
+                <div id="rek-bca" class="rek-info" style="display: none;">
+                    <strong style="color: white; font-size: 1.1em;">BCA: 123-456-7890</strong><br>
+                    <span style="color: #aaa;">a.n Luky Fresh Official</span>
+                </div>
+
+                <div id="rek-mandiri" class="rek-info" style="display: none;">
+                    <strong style="color: white; font-size: 1.1em;">MANDIRI: 000-111-222-333</strong><br>
+                    <span style="color: #aaa;">a.n Luky Fresh Official</span>
+                </div>
+
+                <div id="rek-dana" class="rek-info" style="display: none;">
+                    <strong style="color: white; font-size: 1.1em;">DANA: 0812-3456-7890</strong><br>
+                    <span style="color: #aaa;">a.n Luky Fresh</span>
+                </div>
+                
+                <p style="color: #e57373; font-size: 0.85em; margin-top: 10px; margin-bottom: 0;">
+                    *Pesanan akan diproses setelah bukti transfer dikirim via WhatsApp.
+                </p>
+            </div>
+
+            {{-- Script Javascript Sederhana buat Show/Hide --}}
+            <script>
+                function cekMetodePembayaran() {
+                    var dropdown = document.getElementById("metode_pembayaran");
+                    var infoBox = document.getElementById("info-transfer");
+                    var val = dropdown.value;
+
+                    // Reset semua info rekening dulu
+                    document.querySelectorAll('.rek-info').forEach(el => el.style.display = 'none');
+
+                    if (val === 'cod') {
+                        infoBox.style.display = 'none';
+                    } else {
+                        infoBox.style.display = 'block';
+                        
+                        if(val === 'transfer_bca') document.getElementById('rek-bca').style.display = 'block';
+                        if(val === 'transfer_mandiri') document.getElementById('rek-mandiri').style.display = 'block';
+                        if(val === 'ewallet_dana') document.getElementById('rek-dana').style.display = 'block';
+                    }
+                }
+            </script>
             
             <button type="submit" class="btn-process-order">Buat Pesanan</button>
         </div>

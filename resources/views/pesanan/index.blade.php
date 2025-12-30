@@ -123,7 +123,50 @@
                     {{-- Variabel total_harga & alamat_pengiriman dari kode asli Anda --}}
                     <div class="order-card-footer" style="background: none; padding: 0 0 20px 0; border: none;">
                         <p><strong>Total:</strong> Rp{{ number_format($p->total_harga) }}</p>
+                        <p><strong>Metode Pembayaran:</strong> 
+                            @if($p->metode_pembayaran == 'cod')
+                                Cash On Delivery (COD)
+                            @else
+                                {{ ucwords(str_replace('_', ' ', $p->metode_pembayaran)) }}
+                            @endif
+                        </p>
                         <p><strong>Alamat Pengiriman:</strong> {{ $p->alamat_pengiriman }}</p>
+
+                        {{-- LOGIKA TOMBOL AKSI --}}
+                        <div style="margin-top: 15px;">
+                        
+                        {{-- UBAH DISINI: Cek status 'menunggu_pembayaran' --}}
+                        @if($p->metode_pembayaran != 'cod' && ($p->status == 'menunggu' || $p->status == 'menunggu_pembayaran'))
+                            
+                            <div class="alert alert-warning" style="background-color: #3e2a00; color: #ffc107; padding: 10px; border-radius: 5px; font-size: 0.9em; margin-bottom: 10px;">
+                                <i class="fa fa-clock-o"></i> Menunggu Pembayaran
+                            </div>
+                            
+                            {{-- Tombol Konfirmasi WA --}}
+                            <a href="https://wa.me/6288224441157?text=Halo%20Admin%20LukyFresh,%20saya%20mau%20konfirmasi%20pembayaran%20untuk%20Pesanan%20ID:%20{{ $p->id }}" 
+                               target="_blank" 
+                               class="btn" 
+                               style="background-color: #25D366; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; display: inline-block;">
+                                <img src="{{ asset('foto/asset/whatsapp.svg') }}" style="width: 18px; vertical-align: middle; margin-right: 5px;">
+                                Konfirmasi Bukti Transfer
+                            </a>
+                        
+                        {{-- Tombol Pesanan Diterima --}}
+                        @elseif($p->status == 'dikirim')
+                            <form action="{{ route('pesanan.selesai', $p->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Yakin pesanan sudah diterima?')">
+                                    ✅ Pesanan Diterima
+                                </button>
+                            </form>
+                        
+                        {{-- Status Selesai --}}
+                        @elseif($p->status == 'selesai')
+                            <p class="text-success mt-2"><em>Pesanan Selesai</em></p>
+                            
+                        @endif
+
+                    </div>
                     </div>
 
                     {{-- Teks dan list dari kode asli Anda --}}

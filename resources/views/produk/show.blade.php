@@ -63,6 +63,20 @@
         margin-bottom: 25px;
     }
 
+
+    .stock-badge {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: 25px;
+        width: fit-content;
+    }
+    .stock-habis { background-color: #d32f2f; color: white; border: 1px solid #b71c1c; }
+    .stock-nipis { background-color: #ffa000; color: #121212; border: 1px solid #ff8f00; }
+    .stock-aman { background-color: #2e7d32; color: white; border: 1px solid #1b5e20; }
+
     /* Form Actions Section */
     .product-actions-form {
         display: flex;
@@ -219,6 +233,21 @@
                 <h1 class="product-title">{{ $produk->nama }}</h1>
                 <p class="product-price">Rp{{ number_format($produk->harga) }}</p>
                 
+                {{-- --- BAGIAN INDIKATOR STOK --- --}}
+                @if($produk->stok == 0)
+                    <div class="stock-badge stock-habis">
+                        <i class="fa fa-times-circle"></i> Stok Habis
+                    </div>
+                @elseif($produk->stok <= 5)
+                    <div class="stock-badge stock-nipis">
+                        <i class="fa fa-exclamation-circle"></i> Stok Menipis: Sisa {{ $produk->stok }}
+                    </div>
+                @else
+                    <div class="stock-badge stock-aman">
+                        <i class="fa fa-check-circle"></i> Stok Tersedia: {{ $produk->stok }}
+                    </div>
+                @endif
+
                 <form action="{{ route('keranjang.tambah', $produk->id) }}" method="POST" class="product-actions-form">
                     @csrf
                     <input class="quantity-input" type="number" name="jumlah" value="1" min="1">
@@ -243,20 +272,27 @@
       </a>
     </div>
 <div class="row">
-    @foreach ($produkRekomendasi as $produk)
-      <div class="col-4">
-          <a href="{{ route('produk.show', $produk->id) }}">
-              @if ($produk->foto)
-                  <img src="{{ asset('foto_produk/' . $produk->foto) }}" alt="{{ $produk->nama }}" style="width:100%; aspect-ratio: 1/1; object-fit:cover;">
-              @else
-                  <img src="https://via.placeholder.com/250x250?text=Tidak+ada+Foto" alt="Tidak ada foto">
-              @endif
-          </a>
-          <h4>{{ $produk->nama }}</h4>
-          <p>Rp{{ number_format($produk->harga, 0, ',', '.') }}</p>
-      </div>
-      @endforeach
-</div>
+        @foreach ($produkRekomendasi as $p)
+        <div class="col-4">
+            <a href="{{ route('produk.show', $p->id) }}">
+                @if ($p->foto)
+                    {{-- Gambar di rekomendasi juga dikasih efek kalau habis --}}
+                    <img src="{{ asset('foto_produk/' . $p->foto) }}" alt="{{ $p->nama }}" 
+                         style="width:100%; aspect-ratio: 1/1; object-fit:cover; {{ $p->stok == 0 ? 'filter: grayscale(100%); opacity: 0.6;' : '' }}">
+                @else
+                    <img src="https://via.placeholder.com/250x250?text=Tidak+ada+Foto" alt="Tidak ada foto">
+                @endif
+            </a>
+            <h4>{{ $p->nama }}</h4>
+            <p>Rp{{ number_format($p->harga, 0, ',', '.') }}</p>
+            
+            {{-- Indikator stok mini di rekomendasi --}}
+            @if($p->stok == 0)
+                <small style="color: #e57373;">Stok Habis</small>
+            @endif
+        </div>
+        @endforeach
+    </div>
 </div>
 
 @endsection

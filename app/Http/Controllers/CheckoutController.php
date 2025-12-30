@@ -22,7 +22,16 @@ class CheckoutController extends Controller
         $request->validate([
             'alamat_pengiriman' => 'required|string',
             'metode_pembayaran' => 'required|string',
+            'wilayah' => 'required|string', // Validasi baru
         ]);
+
+        // TENTUKAN HARGA ONGKIR DISINI
+        $ongkir = 0;
+        if ($request->wilayah == 'bandung_kota') {
+            $ongkir = 10000;
+        } elseif ($request->wilayah == 'bandung_barat') {
+            $ongkir = 20000;
+        }
 
         DB::beginTransaction();
         try {
@@ -32,17 +41,32 @@ class CheckoutController extends Controller
                 return back()->with('error', 'Keranjang kosong!');
             }
 
-            $total = 0;
+            $subtotal = 0;
             foreach ($keranjang as $item) {
-                $total += $item->produk->harga * $item->jumlah;
+                // Cek stok dulu sebelum checkout biar aman
+                if ($item->produk->stok < $item->jumlah) {
+                    return back()->with('error', 'Stok produk ' . $item->produk->nama . ' tidak mencukupi!');
+                }
+                $subtotal += $item->produk->harga * $item->jumlah;
             }
+            
+            // Total Akhir = Subtotal Barang + Ongkir
+            $grand_total = $subtotal + $ongkir;
 
+            // Kita gabungkan info wilayah ke alamat biar admin tau
+            $alamat_lengkap = $request->alamat_pengiriman . " (Wilayah: " . str_replace('_', ' ', strtoupper($request->wilayah)) . ")";
+
+            $statusAwal = 'diproses';
+            if ($request->metode_pembayaran != 'cod') {
+                $statusAwal = 'menunggu_pembayaran'; // Status baru, pastikan enum di database support atau pakai string biasa
+            }
+            
             $pesanan = Pesanan::create([
                 'user_id' => Auth::id(),
-                'alamat_pengiriman' => $request->alamat_pengiriman,
+                'alamat_pengiriman' => $alamat_lengkap,
                 'metode_pembayaran' => $request->metode_pembayaran,
-                'status' => 'diproses',
-                'total_harga' => $total,
+                'status' => $statusAwal, // Ganti ini
+                'total_harga' => $grand_total,
             ]);
 
             foreach ($keranjang as $item) {
@@ -61,10 +85,10 @@ class CheckoutController extends Controller
             Keranjang::where('user_id', Auth::id())->delete();
 
             DB::commit();
-            return redirect()->route('pesanan.saya')->with('success', 'Checkout berhasil!');
+            return redirect()->route('pesanan.saya')->with('success', 'Checkout berhasil! Ongkir ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat checkout: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

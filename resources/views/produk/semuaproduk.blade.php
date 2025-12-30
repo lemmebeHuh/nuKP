@@ -74,6 +74,19 @@
             </a>
             <h4>{{ $produk->nama }}</h4>
             <p>Rp{{ number_format($produk->harga, 0, ',', '.') }}</p>
+            @if($produk->stok == 0)
+    <p style="color: #ff4d4d; font-size: 0.9em; margin-top: 5px;">
+        <i class="fa fa-times-circle"></i> Stok Habis
+    </p>
+@elseif($produk->stok <= 5)
+    <p style="color: #ffc107; font-size: 0.9em; margin-top: 5px;">
+        <i class="fa fa-exclamation-circle"></i> Segera Habis! Sisa {{ $produk->stok }}
+    </p>
+@else
+    <p style="color: yellowgreen; font-size: 0.9em; margin-top: 5px;">
+        <i class="fa fa-check-circle"></i> Stok Tersedia
+    </p>
+@endif
         </div>
         @empty
         <p>Tidak ada produk ditemukan.</p>

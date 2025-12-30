@@ -201,7 +201,21 @@
                         <td>{{ $produk->nama }}</td>
                         <td>{{ ucfirst($produk->kategori) }}</td>
                         <td>Rp{{ number_format($produk->harga, 0, ',', '.') }}</td>
-                        <td>{{ $produk->stok }}</td>
+                        <td>
+    @if($produk->stok == 0)
+        <span style="background-color: #d9534f; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 0.85em;">
+            Habis!
+        </span>
+    @elseif($produk->stok <= 5)
+        <span style="background-color: #f0ad4e; color: black; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 0.85em;">
+            {{ $produk->stok }} (Menipis)
+        </span>
+    @else
+        <span style="background-color: #5cb85c; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 0.85em;">
+            {{ $produk->stok }} (Aman)
+        </span>
+    @endif
+</td>
                         <td>{{ $produk->deskripsi }}</td>
                         <td>
                             <div class="aksi">

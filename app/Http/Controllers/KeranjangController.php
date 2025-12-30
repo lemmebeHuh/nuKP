@@ -23,24 +23,33 @@ class KeranjangController extends Controller
         $produk = Produk::findOrFail($id);
         $userId = Auth::id();
 
+        // Cek dulu barangnya ada di keranjang atau belum
         $keranjangItem = Keranjang::where('user_id', $userId)
                                 ->where('produk_id', $produk->id)
                                 ->first();
 
+        // Hitung total yang ingin dibeli user (jumlah di keranjang + jumlah baru yg mau ditambah)
+        $jumlahSaatIni = $keranjangItem ? $keranjangItem->jumlah : 0;
+        $totalAkanDibeli = $jumlahSaatIni + $request->jumlah;
+
+        // --- VALIDASI STOK DISINI ---
+        if ($totalAkanDibeli > $produk->stok) {
+            // Kalau mau beli lebih dari stok, kita tolak
+            $pesan = 'Stok tidak cukup! Sisa stok produk ini hanya ' . $produk->stok . '. ';
+            if($jumlahSaatIni > 0){
+                $pesan .= '(Kamu sudah punya ' . $jumlahSaatIni . ' di keranjang)';
+            }
+        }
+
         if ($keranjangItem) {
-            // Jika sudah ada, tambahkan jumlahnya (ini sudah benar)
             $keranjangItem->jumlah += $request->jumlah;
             $keranjangItem->save();
         } else {
-            // Jika belum ada, buat item baru
-            // ====================================================================
-            // UBAH BAGIAN INI
             Keranjang::create([
                 'user_id' => $userId,
                 'produk_id' => $produk->id,
-                'jumlah' => $request->jumlah, // Gunakan jumlah dari input form
+                'jumlah' => $request->jumlah,
             ]);
-            // ====================================================================
         }
 
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
