@@ -2,7 +2,7 @@
 <!-- Tombol Akun -->
 <div class="account-container">
   <button onclick="toggleDropdown()" class="account-btn">
-    <img src="foto/asset/person-circle.svg" alt="Akun" width="24">
+    <img src="{{asset ('foto/asset/person-circle.svg')}}" alt="Akun" width="24">
   </button>
 
   <!-- Dropdown -->

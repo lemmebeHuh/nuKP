@@ -2,89 +2,155 @@
 
 @section('konten')
 <style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
     .cart-container {
         max-width: 900px;
-        margin: 30px auto;
+        margin: 40px auto;
         padding: 20px;
-        font-family: 'Segoe UI', sans-serif;
     }
 
     .cart-title {
-        color: yellowgreen;
         text-align: center;
-        margin-bottom: 20px;
+        color: yellowgreen;
+        margin-bottom: 30px;
+        font-size: 2em;
     }
 
     .cart-alert {
-        padding: 12px;
-        margin-bottom: 15px;
-        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        text-align: center;
     }
 
     .cart-alert-success {
-        background-color: #dff0d8;
-        color: #3c763d;
+        background-color: #2a3a2a;
+        color: #a3d9a5;
+        border: 1px solid #3c763d;
     }
-
-    .cart-alert-warning {
-        background-color: #fcf8e3;
-        color: #8a6d3b;
+    
+    .cart-empty-container {
         text-align: center;
+        padding: 50px 20px;
+        background-color: #1e1e1e;
+        border: 1px dashed #444;
+        border-radius: 10px;
     }
 
-    .cart-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
+    .cart-empty-container h4 {
+        color: #ccc;
+        margin-bottom: 20px;
     }
 
-    .cart-table th,
-    .cart-table td {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .cart-table th {
+    .cart-empty-container .btn-shopping {
         background-color: yellowgreen;
-        color: white;
-    }
-
-    .cart-table tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    .cart-btn {
-        display: inline-block;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 4px;
+        color: #121212;
+        padding: 12px 25px;
         text-decoration: none;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-    .cart-btn-danger {
-        background-color: crimson;
-        color: white;
-    }
-
-    .cart-btn-checkout {
-        background-color: yellowgreen;
-        color: white;
-        margin-top: 20px;
-        float: right;
-    }
-
-    .cart-total-row {
+        border-radius: 5px;
         font-weight: bold;
-        background-color: #f0f0f0;
-        color: black
+        transition: background-color 0.3s;
     }
-    tbody{
-        background-color: black;
-        color: white
+
+    .cart-empty-container .btn-shopping:hover {
+        background-color: #bef046;
     }
+    
+    .cart-item {
+        display: flex;
+        background-color: #1e1e1e;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        padding: 15px;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .cart-item-img img {
+        width: 90px;
+        height: 90px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #333;
+    }
+
+    .cart-item-details {
+        flex-grow: 1;
+        margin-left: 20px;
+    }
+    .cart-item-details h5 {
+        margin: 0 0 10px;
+        color: white;
+    }
+    .cart-item-details p {
+        margin: 0;
+        color: #aaa;
+        font-size: 0.9em;
+    }
+
+    .cart-item-actions {
+        text-align: right;
+    }
+    .cart-item-subtotal {
+        color: yellowgreen;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .btn-remove {
+        background: none;
+        border: 1px solid #7c2e2e;
+        color: #e57373;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8em;
+        transition: all 0.3s;
+    }
+    .btn-remove:hover {
+        background-color: #7c2e2e;
+        color: white;
+    }
+
+    .cart-summary {
+        background-color: #1e1e1e;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+    }
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.3em;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .summary-total span:last-child {
+        color: yellowgreen;
+    }
+    
+    .btn-checkout {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: yellowgreen;
+        color: #121212;
+        border: none;
+        border-radius: 5px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn-checkout:hover {
+        background-color: #bef046;
+    }
+
 </style>
 
 <div class="cart-container">
@@ -95,47 +161,50 @@
     @endif
 
     @if($items->isEmpty())
-        <div class="cart-alert cart-alert-warning">Keranjang kamu kosong.</div>
+        <div class="cart-empty-container">
+            <h4>Keranjang kamu masih kosong, nih.</h4>
+            <p style="color: #888; margin-bottom: 30px;">Yuk, cari buah dan sayur segar sekarang!</p>
+            <a href="{{ route('produk.semua') }}" class="btn-shopping">Mulai Belanja</a>
+        </div>
     @else
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>Produk</th>
-                    <th>Harga</th>
-                    <th>Jumlah</th>
-                    <th>Subtotal</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $total = 0; @endphp
-                @foreach($items as $item)
-                    @php
-                        $subtotal = $item->produk->harga * $item->jumlah;
-                        $total += $subtotal;
-                    @endphp
-                    <tr>
-                        <td>{{ $item->produk->nama }}</td>
-                        <td>Rp{{ number_format($item->produk->harga) }}</td>
-                        <td>{{ $item->jumlah }}</td>
-                        <td>Rp{{ number_format($subtotal) }}</td>
-                        <td>
-                            <form action="{{ route('keranjang.hapus', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus item ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="cart-btn cart-btn-danger">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-                <tr class="cart-total-row">
-                    <td colspan="3" style="text-align: right;">Total:</td>
-                    <td colspan="2" style="text-align: left;">Rp{{ number_format($total) }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="cart-items-list">
+            @php $total = 0; @endphp
+            @foreach($items as $item)
+                @php
+                    $subtotal = $item->produk->harga * $item->jumlah;
+                    $total += $subtotal;
+                @endphp
+                <div class="cart-item">
+                    <div class="cart-item-img">
+                         @if ($item->produk->foto)
+                            <img src="{{ asset('foto_produk/' . $item->produk->foto) }}" alt="{{ $item->produk->nama }}">
+                        @else
+                            <img src="https://via.placeholder.com/90x90?text=N/A" alt="Tidak ada foto">
+                        @endif
+                    </div>
+                    <div class="cart-item-details">
+                        <h5>{{ $item->produk->nama }}</h5>
+                        <p>Rp{{ number_format($item->produk->harga) }} x {{ $item->jumlah }}</p>
+                    </div>
+                    <div class="cart-item-actions">
+                        <p class="cart-item-subtotal">Rp{{ number_format($subtotal) }}</p>
+                        <form action="{{ route('keranjang.hapus', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus item ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-remove">Hapus</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
 
-        <a href="{{ route('checkout.form') }}" class="cart-btn cart-btn-checkout">Lanjut ke Checkout</a>
+        <div class="cart-summary">
+            <div class="summary-total">
+                <span>Total Belanja</span>
+                <span>Rp{{ number_format($total) }}</span>
+            </div>
+            <a href="{{ route('checkout.form') }}" class="btn-checkout">Lanjut ke Checkout</a>
+        </div>
     @endif
 </div>
 @endsection

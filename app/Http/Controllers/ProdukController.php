@@ -291,7 +291,7 @@ public function kategoriRempah(Request $request)
         unlink(public_path('foto_produk/' . $produk->foto));
     }
 
-    $produk->delete();
+    $produk->delete();  
 
     return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus!');
     }

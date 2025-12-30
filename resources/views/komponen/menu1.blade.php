@@ -36,10 +36,10 @@
         
         
         <a class="cartt" href="/keranjang">
-          <img src="foto/asset/cart.png" alt="" width="30px" height="30px"/>
+          <img src="{{ asset('foto/asset/cart.png') }}" alt="" width="30px" height="30px"/>
         </a>
           <img
-            src="foto/menu.png"
+            src="{{asset('foto/menu.png')}}"
             alt=""
             class="menu-icon"
             onclick="menutoggle()"
